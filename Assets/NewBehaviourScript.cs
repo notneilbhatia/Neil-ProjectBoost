@@ -4,21 +4,33 @@ using UnityEngine.SceneManagement;
 
 public class NewBehaviourScript : MonoBehaviour {
     Rigidbody rigidBody;
-	AudioSource thrust;
-   [SerializeField] float rcsThrust = 100f;
-   [SerializeField] float mainThrust = 100f;
+    AudioSource audioSource;
 
-	void Start () {
-		rigidBody = GetComponent<Rigidbody> ();
-		thrust = GetComponent<AudioSource> ();
-	}
-	
-	// Update is called once per frame
-	void Update ()
+    [SerializeField] float rcsThrust = 100f;
+    [SerializeField] float mainThrust = 100f;
+    [SerializeField] AudioClip mainEngine;
+    [SerializeField] AudioClip win;
+    [SerializeField] AudioClip crash;
+
+    enum State { Alive, Dying, Transcending }
+    State state = State.Alive;
+
+
+
+    void Start() {
+        rigidBody = GetComponent<Rigidbody>();
+        audioSource = GetComponent<AudioSource>();
+    }
+
+    // Update is called once per frame
+    void Update()
     {
+        if (state == State.Alive)
+        { 
         Fly();
         Rotate();
     }
+}
     void OnCollisionEnter(Collision collision)
     {
         switch (collision.gameObject.tag)
@@ -31,16 +43,42 @@ public class NewBehaviourScript : MonoBehaviour {
 
             case "Finish":
                 {
-                    SceneManager.LoadScene(1);
+                    StartSuccessSequence();
                     break;
                 }
-                
+
             default:
-                { 
-                SceneManager.LoadScene(0);
-                break;
+                {
+                    StartDeathSequence();
+                    break;
+                }
         }
-        }
+    }
+
+    private void StartDeathSequence()
+    {
+        state = State.Dying;
+        Invoke("LoadFirstLevel", 1f);
+        audioSource.Stop();
+        audioSource.PlayOneShot(crash);
+    }
+
+    private void StartSuccessSequence()
+    {
+        Invoke("LoadNextLevel", 1f);
+        state = State.Transcending;
+        audioSource.Stop();
+        audioSource.PlayOneShot(win);
+    }
+
+    private void LoadFirstLevel()
+    {
+        SceneManager.LoadScene(0);
+    }
+
+    private void LoadNextLevel()
+    {
+        SceneManager.LoadScene(1);
     }
 
     private void Fly()
@@ -49,14 +87,14 @@ public class NewBehaviourScript : MonoBehaviour {
         {
             rigidBody.AddRelativeForce(Vector3.up);
 
-            if (!thrust.isPlaying)
+            if (!audioSource.isPlaying)
             {
-                thrust.Play();
+                audioSource.PlayOneShot(mainEngine);
             }
         }
         else
         {
-            thrust.Stop();
+            audioSource.Stop();
         }
     }
 
