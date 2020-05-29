@@ -11,7 +11,10 @@ public class NewBehaviourScript : MonoBehaviour {
     [SerializeField] AudioClip mainEngine;
     [SerializeField] AudioClip win;
     [SerializeField] AudioClip crash;
-
+    [SerializeField] ParticleSystem mainEngineParticles;
+    [SerializeField] ParticleSystem winParticles;
+    [SerializeField] ParticleSystem crashParticles;
+   [SerializeField] float LevelLoadDelay = 2f;
     enum State { Alive, Dying, Transcending }
     State state = State.Alive;
 
@@ -61,6 +64,7 @@ public class NewBehaviourScript : MonoBehaviour {
         Invoke("LoadFirstLevel", 1f);
         audioSource.Stop();
         audioSource.PlayOneShot(crash);
+        crashParticles.Play();
     }
 
     private void StartSuccessSequence()
@@ -69,6 +73,7 @@ public class NewBehaviourScript : MonoBehaviour {
         state = State.Transcending;
         audioSource.Stop();
         audioSource.PlayOneShot(win);
+        winParticles.Play();
     }
 
     private void LoadFirstLevel()
@@ -85,16 +90,18 @@ public class NewBehaviourScript : MonoBehaviour {
     {
         if (Input.GetKey(KeyCode.Space))
         {
-            rigidBody.AddRelativeForce(Vector3.up);
+            rigidBody.AddRelativeForce(Vector3.up*Time.deltaTime*mainThrust);
 
             if (!audioSource.isPlaying)
             {
                 audioSource.PlayOneShot(mainEngine);
             }
+            mainEngineParticles.Play();
         }
         else
         {
             audioSource.Stop();
+            mainEngineParticles.Stop();
         }
     }
 
