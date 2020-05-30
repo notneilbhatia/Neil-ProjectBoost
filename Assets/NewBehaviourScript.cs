@@ -108,7 +108,11 @@ public class NewBehaviourScript : MonoBehaviour {
     private void LoadNextLevel()
     {
         int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-        SceneManager.LoadScene(1);
+        int nextSceneIndex = currentSceneIndex + 1;
+        if (nextSceneIndex == SceneManager.sceneCountInBuildSettings)
+            LoadFirstLevel();
+        else
+        SceneManager.LoadScene(nextSceneIndex);
     }
 
     private void Fly()
