@@ -1,4 +1,5 @@
 ﻿
+using System.Diagnostics;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -15,6 +16,9 @@ public class NewBehaviourScript : MonoBehaviour {
     [SerializeField] ParticleSystem succcess;
     [SerializeField] ParticleSystem boom;
 
+    bool CollisionsDisabled = false;
+    bool Debugger = true;
+
 
     enum State { Alive, Dying, Transcending }
     State state = State.Alive;
@@ -29,16 +33,35 @@ public class NewBehaviourScript : MonoBehaviour {
     // Update is called once per frame
     void Update()
     {
+        if (Debugger == true)
+        debugkeys();
+
         if (state == State.Alive)
-        { 
-        Fly();
-        Rotate();
+        {
+            Fly();
+            Rotate();
+        }
     }
-}
+
+    private void debugkeys()
+    {
+        if (Input.GetKey(KeyCode.L))
+        {
+            LoadNextLevel();
+        }
+
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            CollisionsDisabled = !CollisionsDisabled;
+        }
+    }
+
     void OnCollisionEnter(Collision collision)
     {
+        if (state != State.Alive || CollisionsDisabled) { return; }
         switch (collision.gameObject.tag)
         {
+           
             case "Respawn":
                 {
                     print("Good Luck");
@@ -84,6 +107,7 @@ public class NewBehaviourScript : MonoBehaviour {
 
     private void LoadNextLevel()
     {
+        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
         SceneManager.LoadScene(1);
     }
 
