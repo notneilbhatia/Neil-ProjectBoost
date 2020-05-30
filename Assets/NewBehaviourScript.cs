@@ -19,10 +19,7 @@ public class NewBehaviourScript : MonoBehaviour {
     bool CollisionsDisabled = false;
     bool Debugger = true;
 
-
-    enum State { Alive, Dying, Transcending }
-    State state = State.Alive;
-
+    bool isTransitioning = false;
 
 
     void Start() {
@@ -36,7 +33,7 @@ public class NewBehaviourScript : MonoBehaviour {
         if (Debugger == true)
         debugkeys();
 
-        if (state == State.Alive)
+        if (!isTransitioning)
         {
             Fly();
             Rotate();
@@ -58,7 +55,7 @@ public class NewBehaviourScript : MonoBehaviour {
 
     void OnCollisionEnter(Collision collision)
     {
-        if (state != State.Alive || CollisionsDisabled) { return; }
+        if (isTransitioning || CollisionsDisabled) { return; }
         switch (collision.gameObject.tag)
         {
            
@@ -84,7 +81,7 @@ public class NewBehaviourScript : MonoBehaviour {
 
     private void StartDeathSequence()
     {
-        state = State.Dying;
+        isTransitioning = true;
         Invoke("LoadFirstLevel", 1f);
         audioSource.Stop();
         audioSource.PlayOneShot(crash);
@@ -93,8 +90,8 @@ public class NewBehaviourScript : MonoBehaviour {
 
     private void StartSuccessSequence()
     {
+        isTransitioning = true;
         Invoke("LoadNextLevel", 1f);
-        state = State.Transcending;
         audioSource.Stop();
         audioSource.PlayOneShot(win);
         succcess.Play();
@@ -113,6 +110,7 @@ public class NewBehaviourScript : MonoBehaviour {
             LoadFirstLevel();
         else
         SceneManager.LoadScene(nextSceneIndex);
+        
     }
 
     private void Fly()
@@ -136,7 +134,7 @@ public class NewBehaviourScript : MonoBehaviour {
 
     private void Rotate()
     {
-        rigidBody.freezeRotation = true;
+        rigidBody.angularVelocity = Vector3.zero;
         float rotationthisframe = rcsThrust * Time.deltaTime;
 
         if (Input.GetKey(KeyCode.A))
