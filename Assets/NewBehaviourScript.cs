@@ -55,7 +55,8 @@ public class NewBehaviourScript : MonoBehaviour {
 
     void OnCollisionEnter(Collision collision)
     {
-        if (isTransitioning || CollisionsDisabled) { return; }
+       
+       
         switch (collision.gameObject.tag)
         {
            
@@ -76,6 +77,7 @@ public class NewBehaviourScript : MonoBehaviour {
                     StartDeathSequence();
                     break;
                 }
+                if (isTransitioning || CollisionsDisabled) { return; }
         }
     }
 
@@ -104,12 +106,7 @@ public class NewBehaviourScript : MonoBehaviour {
 
     private void LoadNextLevel()
     {
-        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-        int nextSceneIndex = currentSceneIndex + 1;
-        if (nextSceneIndex <= SceneManager.sceneCountInBuildSettings)
-            LoadFirstLevel();
-        else
-        SceneManager.LoadScene(nextSceneIndex);
+        SceneManager.LoadScene(0);
         
     }
 
