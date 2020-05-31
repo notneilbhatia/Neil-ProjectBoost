@@ -56,7 +56,9 @@ public class NewBehaviourScript : MonoBehaviour {
     void OnCollisionEnter(Collision collision)
     {
        
-       
+
+        if (isTransitioning || CollisionsDisabled) { return; }
+
         switch (collision.gameObject.tag)
         {
            
@@ -77,7 +79,7 @@ public class NewBehaviourScript : MonoBehaviour {
                     StartDeathSequence();
                     break;
                 }
-                if (isTransitioning || CollisionsDisabled) { return; }
+              
         }
     }
 
@@ -92,8 +94,8 @@ public class NewBehaviourScript : MonoBehaviour {
 
     private void StartSuccessSequence()
     {
-        isTransitioning = true;
         Invoke("LoadNextLevel", 1f);
+        isTransitioning = true;
         audioSource.Stop();
         audioSource.PlayOneShot(win);
         succcess.Play();
@@ -106,8 +108,17 @@ public class NewBehaviourScript : MonoBehaviour {
 
     private void LoadNextLevel()
     {
-        SceneManager.LoadScene(0);
+
+        SceneManager.LoadScene(1);
         
+
+        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+        int nextSceneIndex = currentSceneIndex + 1;
+        if (nextSceneIndex == SceneManager.sceneCountInBuildSettings)
+            LoadFirstLevel();
+        else
+        SceneManager.LoadScene(nextSceneIndex);
+
     }
 
     private void Fly()
@@ -142,6 +153,6 @@ public class NewBehaviourScript : MonoBehaviour {
         {
             transform.Rotate(-Vector3.forward*rotationthisframe);
         }
-        rigidBody.freezeRotation = false;
+       
     }
 }
